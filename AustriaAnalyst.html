@@ -54,6 +54,12 @@
 			var dropZone;
 			var resultsContainer;
 			
+			var data;
+			var selectedResorts = [];
+			var selectedDates = [];
+			
+			
+			
 			/* PAGE LOAD -------------------------------------------------------------------------------------------------------*/
 			
 			window.onload = function() {
@@ -105,13 +111,18 @@
 				}
 			}
 			
+			
+			
 			/* JSON -------------------------------------------------------------------------------------------------------------*/
 			
 			// PROCESS JSON FILE
 			function processJSON(obj) {
 				
 				var resortList = document.getElementById("resort-list");
+				resortList.addEventListener('change', selectResort, false);
+				
 			    var dateList = document.getElementById("date-list");
+				dateList.addEventListener('change', selectDate, false);
 				
 				var dates = [];	// Buffer for saved days
 				
@@ -144,6 +155,36 @@
 			}
 			
 			
+			
+			// RESORT SELECTION
+			function selectResort() {
+				selectedResorts = [];
+				for(var i = 0; i < this.options.length; i++) {
+					if(this.options[i].selected) selectedResorts.push(this.options[i].value);	
+				}
+				displayResults();
+			}
+			
+			
+			
+			// DATE SELECTION
+			function selectDate() {
+				selectedDates = [];
+				for(var i = 0; i < this.options.length; i++) {
+					if(this.options[i].selected) selectedDates.push(this.options[i].value);	
+				}
+				displayResults();
+			}
+
+
+
+			/* JSON -------------------------------------------------------------------------------------------------------------*/
+			
+			function displayResults() {
+				console.log(selectedResorts);
+				console.log(selectedDates);
+			}
+
 			
 			// Comparator
 			var dateComparator = function(a, b) {
