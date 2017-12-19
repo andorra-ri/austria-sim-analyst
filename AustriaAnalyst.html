@@ -41,13 +41,17 @@
 			    font-size:0;
 			    animation: spin 0.7s linear infinite;
 			}
+			
+			/* RESULTS */
+			#results { display:none }
+			select[multiple] { height:200px }
 						
 		</style>
 		
 		<script type="text/javascript">
 			
 			var dropZone;
-			
+			var resultsContainer;
 			
 			/* PAGE LOAD -------------------------------------------------------------------------------------------------------*/
 			
@@ -60,6 +64,8 @@
 				dropZone = document.getElementById('drop-zone');
 				dropZone.addEventListener('dragover', handleDragOver, false);
 				dropZone.addEventListener('drop', handleFileDrop, false);
+				// Results
+				resultsContainer = document.getElementById('results');
 			}
 			
 			
@@ -84,17 +90,65 @@
 					// Read file
 					var reader = new FileReader();
 					reader.onload = function(e) {
-						try {	// Check if file is a valid JSON
+						//try {	// Check if file is a valid JSON
 					        var obj = JSON.parse(reader.result);
-							console.log(obj);
-							dropZone.classList.remove('loading');
-					    } catch (e) {	// File is not a valid JSON 
-						    alert('Error! File is not a valid JSON');
-					        dropZone.classList.remove('loading');
-					    }
+							dropZone.outerHTML = '';					// Delete DRAG & DROP area
+					        processJSON(obj);							// Process JSON object
+					        resultsContainer.style.display = "block";	// Show results
+					    //} catch (e) {	// File is not a valid JSON 
+						//    alert('Error! File is not a valid JSON');
+					    //    dropZone.classList.remove('loading');
+					    //}
 					}
 					reader.readAsText(files[i]);
 				}
+			}
+			
+			/* JSON -------------------------------------------------------------------------------------------------------------*/
+			
+			// PROCESS JSON FILE
+			function processJSON(obj) {
+				
+				var resortList = document.getElementById("resort-list");
+			    var dateList = document.getElementById("date-list");
+				
+				var dates = [];	// Buffer for saved days
+				
+				// List all resorts in resortList
+				obj.resorts.forEach(function(resort, i) {
+					var resortOpt = document.createElement('option');
+						resortOpt.value = i;
+						resortOpt.text = resort.name;
+					resortList.appendChild(resortOpt);
+						
+					// List unique days
+					resort.days.forEach(function(day) {
+						if(dates.indexOf(day.date)==-1) dates.push(day.date);	
+					});
+						
+				});
+				
+				// Sort date buffer
+				dates.sort(dateComparator);
+				
+				// List dates in dateList
+				dates.forEach(function(date) {
+					var dateOpt = document.createElement('option');
+						dateOpt.value = date;
+						dateOpt.text = date;
+					dateList.appendChild(dateOpt);
+				});
+				
+				data = obj;	 // Keep data in memory
+			}
+			
+			
+			
+			// Comparator
+			var dateComparator = function(a, b) {
+				var aa = a.split('/').reverse().join(),
+					bb = b.split('/').reverse().join();
+				return aa < bb ? -1 : (aa > bb ? 1 : 0);
 			}
 			
 		</script>
@@ -105,6 +159,10 @@
 		
 		<!-- DRAG & DROP Zone -->
 		<section id="drop-zone">Drop JSON file here</section>
+		<section id="results">
+			<select multiple id="resort-list"></select>
+			<select multiple id="date-list"></select>
+		</section>
 
 	</body>
 </html>
