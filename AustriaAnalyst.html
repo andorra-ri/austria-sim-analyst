@@ -59,6 +59,8 @@
 			tbody tr.selected { background:#d3e7ff }
 			td { position:relative; padding:10px 15px; text-align:center }
 				td:first-child { text-align:right }
+			td a .icon { fill:#AAAAAA; height:15px; width:15px }
+			td a .icon:hover, td a.open .icon { fill:#000000; height:15px; width:15px }
 			tfoot { border:1px solid #DDDDDD; border-top:0; background:#EEEEEE }
 			
 			/* TOOLTIP */
@@ -259,6 +261,7 @@
 					+ '<th data-tooltip="Holiday-Makers" onclick="sortTable(\'stats-table\',5)"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
 					+ '<th data-tooltip="Crowded days" onclick="sortTable(\'stats-table\',6)"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
 					+ '<th data-tooltip="Bed capacity reached" onclick="sortTable(\'stats-table\',7)"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
+					+ '<th></th>'
 				+ '</tr></thead>'
 				+ '<tbody>';
 				
@@ -310,6 +313,7 @@
 						+ '<td class="table-hm">' + skiersHM + '</td>'
 						+ '<td class="table-crowd">' + crowdedDays + '</td>'
 						+ '<td class="table-bedcap">' + bedCapReached + '</td>'
+						+ '<td><a href="#" data-tooltip="+ info" onclick="extend(event, this, ' + r + ')"><svg class="icon"><use xlink:href="#icon-eye"></use></svg></a></td>'
 					+ '</tr>';
 					
 				});
@@ -331,10 +335,36 @@
 					+ '<td>' + Math.round(globalSkiersHM) + '</td>'
 					+ '<td>' + Math.round(globalCrowded) + '</td>'
 					+ '<td>' + Math.round(globalBedCap) + '</td>'
+					+ '<td></td>';
 				+ '</tr></tfoot>'
 				+ '</table>';
 				
 				container.innerHTML += table;
+			}
+			
+			
+			
+			// EXTEND RESORT INFO
+			function extend(e, toggler, r) {
+				e.preventDefault();
+				
+				var TR = toggler.parentNode.parentNode;
+				var table = TR.parentNode;
+
+				if(toggler.classList.toggle('open')) {
+				
+					var content = document.createElement('p');
+						content.innerHTML = 'More info';
+						
+					var newTR = document.createElement('tr');
+					var newTD = document.createElement('td');
+						newTD.colSpan = '9';
+						newTD.appendChild(content);
+					newTR.appendChild(newTD);
+					table.insertBefore(newTR, TR.nextSibling);
+					
+				} else TR.nextSibling.outerHTML = '';
+				
 			}
 			
 			
