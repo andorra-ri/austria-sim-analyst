@@ -73,7 +73,13 @@
 					// Read file
 					var reader = new FileReader();
 					reader.onload = function(e) {
-						console.log(reader.result);
+						try {	// Check if file is a valid JSON
+					        var obj = JSON.parse(reader.result);
+							console.log(obj);
+					    } catch (e) {	// File is not a valid JSON 
+						    alert('Error! File is not a valid JSON');
+					        dropZone.classList.remove('loading');
+					    }
 					}
 					reader.readAsText(files[i]);
 				}
