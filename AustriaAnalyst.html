@@ -52,13 +52,14 @@
 			input[type=text] { line-height:25px; border-radius:3px; border:1px solid #DDDDDD; padding:0 7px; margin:10px 0 }
 			#table-container { display:inline-block; margin:0 auto; text-align:right }
 			table { font-size:12px; border-collapse:collapse }
-			th { background:#686868; color:#FFFFFF; padding:10px 15px; position:relative; cursor:pointer }
+			th { background:#686868; color:#FFFFFF; padding:10px 15px; position:relative; cursor:pointer; text-align:center }
 				th:first-child { text-align:right }
 			th .icon { fill:#FFFFFF; height:15px; width:15px }
 			tbody tr { border:1px solid #DDDDDD; border-top:0 }
 			tbody tr.selected { background:#d3e7ff }
 			td { position:relative; padding:10px 15px; text-align:center }
 				td:first-child { text-align:right }
+			tfoot { border:1px solid #DDDDDD; border-top:0; background:#EEEEEE }
 			
 			/* TOOLTIP */
 			[data-tooltip]:before {
@@ -239,6 +240,14 @@
 				
 				container.innerHTML = '<input type="text" name="search" onkeyup="find(\'stats-table\', 0, this.value)" placeholder="Search..." />';
 				
+				// Global (accumulative / mean) variables
+				var globalSeasonLength = 0,
+					globalOpenDays = 0,
+					globalSkiersDT = 0,
+					globalSkiersHM = 0,
+					globalCrowded = 0,
+					globalBedCap = 0;
+				
 				// Start table
 				var table = '<table id="stats-table">'
 				+ '<thead><tr>'
@@ -283,6 +292,14 @@
 						}
 					});
 					
+					// Update global variables
+					globalSeasonLength += seasonLength;
+					globalOpenDays += openDays;
+					globalSkiersDT += skiersDT;
+					globalSkiersHM += skiersHM;
+					globalCrowded += crowdedDays;
+					globalBedCap += bedCapReached;
+					
 					// Add resort table register
 					table += '<tr>'
 						+ '<td class="table-name">' + resort.name + '</td>'
@@ -297,8 +314,24 @@
 					
 				});
 				
+				// Update variables that are mean
+				globalSeasonLength /= selectedResorts.length;
+				globalOpenDays /= selectedResorts.length;
+				globalCrowded /= selectedResorts.length;
+				globalBedCap /= selectedResorts.length;
+				
 				// Close table
 				table += '</tbody>'
+				+ '<tfoot><tr>'
+					+ '<td>TOTAL / MEAN</th>'
+					+ '<td>' + Math.round(globalSeasonLength) + '</td>'
+					+ '<td>' + Math.round(globalOpenDays) + '</td>'
+					+ '<td>' + Math.round(globalSkiersDT + globalSkiersHM) + '</td>'
+					+ '<td>' + Math.round(globalSkiersDT) + '</td>'
+					+ '<td>' + Math.round(globalSkiersHM) + '</td>'
+					+ '<td>' + Math.round(globalCrowded) + '</td>'
+					+ '<td>' + Math.round(globalBedCap) + '</td>'
+				+ '</tr></tfoot>'
 				+ '</table>';
 				
 				container.innerHTML += table;
