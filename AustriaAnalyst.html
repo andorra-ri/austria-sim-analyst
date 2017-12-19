@@ -51,17 +51,21 @@
 			/* TABLE */
 			input[type=text] { line-height:25px; border-radius:3px; border:1px solid #DDDDDD; padding:0 7px; margin:10px 0 }
 			#table-container { display:inline-block; margin:0 auto; text-align:right }
-			table { font-size:12px; border-collapse:collapse }
+			table { font-size:12px; border-collapse:collapse; width:100% }
 			th { background:#686868; color:#FFFFFF; padding:10px 15px; position:relative; cursor:pointer; text-align:center }
 				th:first-child { text-align:right }
+			table table th:first-child { text-align:center }
+			table table th .icon { fill:#FFFFFF }
 			th .icon { fill:#FFFFFF; height:15px; width:15px }
 			tbody tr { border:1px solid #DDDDDD; border-top:0 }
 			tbody tr.selected { background:#d3e7ff }
 			td { position:relative; padding:10px 15px; text-align:center }
 				td:first-child { text-align:right }
 			td a .icon { fill:#AAAAAA; height:15px; width:15px }
-			td a .icon:hover, td a.open .icon { fill:#000000; height:15px; width:15px }
+			td .icon, td a .icon:hover, td a.open .icon { fill:#000000; height:15px; width:15px }
 			tfoot { border:1px solid #DDDDDD; border-top:0; background:#EEEEEE }
+			
+			table span { display:inline-block; background:#A8A8A8; color:#FFFFFF; margin:2px; padding:3px 7px; font-size:9px; border-radius:10px }
 			
 			/* TOOLTIP */
 			[data-tooltip]:before {
@@ -353,8 +357,7 @@
 
 				if(toggler.classList.toggle('open')) {
 				
-					var content = document.createElement('p');
-						content.innerHTML = 'More info';
+					var content = getExtendedContent(r);
 						
 					var newTR = document.createElement('tr');
 					var newTD = document.createElement('td');
@@ -365,6 +368,74 @@
 					
 				} else TR.nextSibling.outerHTML = '';
 				
+			}
+			
+			
+			
+			// EXTENDED CONTENT
+			function getExtendedContent(r) {
+				var content = document.createElement('div');
+					content.id = 'extended-content';
+			
+				// Initiate table 
+				var table = document.createElement('table');
+				var header = document.createElement('thead');
+					header.innerHTML = '<tr>'
+						+ '<th data-tooltip="date"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
+						+ '<th data-tooltip="Open/Closed"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
+						+ '<th data-tooltip="Day-Trippers"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
+						+ '<th data-tooltip="Holiday-Makers"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
+						+ '<th data-tooltip="Origins"><svg class="icon"><use xlink:href="#icon-world"></use></svg></a></th>'
+					+ '</tr>';
+				table.appendChild(header);
+				
+				data.resorts[r].days.forEach(function(day) {
+					if( selectedDates.indexOf(day.date) != -1 ) {
+						var tr = getExtendedTableRow(day);
+						table.appendChild(tr);
+					}
+				});
+				
+				content.appendChild(table);
+				return content;
+			}
+			
+			
+			
+			// EXTENDED TABLE ROW
+			function getExtendedTableRow(day) {
+				var tr = document.createElement('tr');
+						
+				var tdDate = document.createElement('td');
+					tdDate.innerHTML = day.date;
+				tr.appendChild(tdDate);
+				
+				var tdOpen = document.createElement('td');
+					tdOpen.innerHTML = day.open ? 'OPEN' : 'CLOSED';
+				tr.appendChild(tdOpen);
+				
+				var tdCountDT = document.createElement('td');
+					tdCountDT.innerHTML = day.skiers.count[0];
+				tr.appendChild(tdCountDT);
+				
+				var tdCountHM = document.createElement('td');
+					tdCountHM.innerHTML = day.skiers.count[1];
+				tr.appendChild(tdCountHM);
+				
+				var origins = []
+				day.skiers.origins.forEach(function(origin) {
+					origins.push(origin.name);
+				});
+				origins.sort();
+				
+				var tdOrigin = document.createElement('td');
+				if(origins.length > 0) {
+					tdOrigin.innerHTML = '<span>' + origins.join('</span><span>') + '</span>';
+					//tdOrigin.innerHTML = '<svg class="icon"><use xlink:href="#icon-world"></use></svg></a>';
+				}
+				tr.appendChild(tdOrigin);
+				
+				return tr;
 			}
 			
 			
