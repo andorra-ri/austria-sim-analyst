@@ -15,6 +15,7 @@
 				text-align:center;
 				font: 12px Arial, 'sans-serif';
 			}
+			hr { border:1px solid transparent; margin:15px 0; }
 			
 			/* DROPZONE */
 			#drop-zone {
@@ -48,11 +49,14 @@
 			select[multiple] { height:200px }
 			
 			/* TABLE */
-			table { font-size:12px; border-collapse:collapse; display:inline-block; margin:30px auto }
+			input[type=text] { line-height:25px; border-radius:3px; border:1px solid #DDDDDD; padding:0 7px; margin:10px 0 }
+			#table-container { display:inline-block; margin:0 auto; text-align:right }
+			table { font-size:12px; border-collapse:collapse }
 			th { background:#686868; color:#FFFFFF; padding:10px 15px; position:relative; cursor:pointer }
 				th:first-child { text-align:right }
 			th .icon { fill:#FFFFFF; height:15px; width:15px }
 			tbody tr { border:1px solid #DDDDDD; border-top:0 }
+			tbody tr.selected { background:#d3e7ff }
 			td { position:relative; padding:10px 15px; text-align:center }
 				td:first-child { text-align:right }
 			
@@ -231,6 +235,10 @@
 			
 			function displayResults() {
 				
+				var container = document.getElementById('table-container');
+				
+				container.innerHTML = '<input type="text" name="search" onkeyup="find(\'stats-table\', 0, this.value)" placeholder="Search..." />';
+				
 				// Start table
 				var table = '<table id="stats-table">'
 				+ '<thead><tr>'
@@ -293,12 +301,13 @@
 				table += '</tbody>'
 				+ '</table>';
 				
-				document.getElementById('table-container').innerHTML = table;
+				container.innerHTML += table;
 			}
 			
 			
 			
 			/* FILTER RESULTS --------------------------------------------------------------------------------------------------------*/
+			
 			// SORT 
 			function sortTable(id, column){
 			    var table = document.getElementById(id).getElementsByTagName('tbody').item(0);
@@ -316,6 +325,19 @@
 				        }
 			        }
 			    }
+			}
+			
+			
+			
+			// FIND
+			function find(id, column, value) {
+				var table = document.getElementById(id).getElementsByTagName('tbody').item(0);
+			    var rows = table.getElementsByTagName('tr');
+			    for(var i = 0; i < rows.length; i++) {
+				    var row = rows.item(i);
+					if(row.getElementsByTagName('td').item(column).textContent.toUpperCase().indexOf(value.toUpperCase()) == -1 || value == '') row.classList.remove('selected');
+				    else row.classList.add('selected'); 
+				}
 			}
 			
 			
@@ -340,6 +362,7 @@
 			<p>Use <span class="key">CTRL</span> and <span class="key">SHIFT</span> keys to select multiple options (<span class="key">&#8984;</span> and <span class="key">&#8679;</span> in Mac)</p>
 			<select multiple id="resort-list"></select>
 			<select multiple id="date-list"></select>
+			<hr/>
 			<section id="table-container"></section>
 		</section>
 
