@@ -44,6 +44,7 @@
 			
 			/* RESULTS */
 			#results { display:none }
+			span.key { display:inline-block; font-size:9px; padding:3px; margin:0 1px; border:1px solid #888888; color:#888888; border-radius:3px }
 			select[multiple] { height:200px }
 						
 		</style>
@@ -160,6 +161,7 @@
 		<!-- DRAG & DROP Zone -->
 		<section id="drop-zone">Drop JSON file here</section>
 		<section id="results">
+			<p>Use <span class="key">CTRL</span> and <span class="key">SHIFT</span> keys to select multiple options (<span class="key">&#8984;</span> and <span class="key">&#8679;</span> in Mac)</p>
 			<select multiple id="resort-list"></select>
 			<select multiple id="date-list"></select>
 		</section>
