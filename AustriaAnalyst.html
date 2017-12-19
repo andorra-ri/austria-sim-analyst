@@ -234,14 +234,14 @@
 				// Start table
 				var table = '<table id="stats-table">'
 				+ '<thead><tr>'
-					+ '<th>RESORT</th>'
-					+ '<th data-tooltip="Season length"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
-					+ '<th data-tooltip="Open days"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
-					+ '<th data-tooltip="Skiers"><svg class="icon"><use xlink:href="#icon-ski"></use></svg></th>'
-					+ '<th data-tooltip="Day-trippers"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
-					+ '<th data-tooltip="Holiday-makers"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
-					+ '<th data-tooltip="Crowded days"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
-					+ '<th data-tooltip="Bed capacity reached"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
+					+ '<th onclick="sortTable(\'stats-table\',0)">RESORT</th>'
+					+ '<th data-tooltip="Season length" onclick="sortTable(\'stats-table\',1)"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
+					+ '<th data-tooltip="Open days" onclick="sortTable(\'stats-table\',2)"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
+					+ '<th data-tooltip="Total skiers" onclick="sortTable(\'stats-table\',3)"><svg class="icon"><use xlink:href="#icon-ski"></use></svg></th>'
+					+ '<th data-tooltip="Day-Trippers" onclick="sortTable(\'stats-table\',4)"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
+					+ '<th data-tooltip="Holiday-Makers" onclick="sortTable(\'stats-table\',5)"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
+					+ '<th data-tooltip="Crowded days" onclick="sortTable(\'stats-table\',6)"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
+					+ '<th data-tooltip="Bed capacity reached" onclick="sortTable(\'stats-table\',7)"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
 				+ '</tr></thead>'
 				+ '<tbody>';
 				
@@ -295,8 +295,32 @@
 				
 				document.getElementById('table-container').innerHTML = table;
 			}
-
 			
+			
+			
+			/* FILTER RESULTS --------------------------------------------------------------------------------------------------------*/
+			// SORT 
+			function sortTable(id, column){
+			    var table = document.getElementById(id).getElementsByTagName('tbody').item(0);
+			    var row = table.getElementsByTagName('tr');            
+			    for(var i = 0; i < row.length - 1; i++){
+			        for(var j = 0; j < row.length - (i + 1); j++){
+				        if(column == 0) {	// Order by name
+					        if(row.item(j).getElementsByTagName('td').item(column).textContent.localeCompare(row.item(j+1).getElementsByTagName('td').item(column).textContent) == 1) {
+				                table.insertBefore(row.item(j+1), row.item(j));
+				            }
+				        } else {  // Order numbers
+				            if(Number(row.item(j).getElementsByTagName('td').item(column).innerHTML.replace(/[^0-9\.]+/g, "")) < Number(row.item(j+1).getElementsByTagName('td').item(column).innerHTML.replace(/[^0-9\.]+/g, ""))) {
+				                table.insertBefore(row.item(j+1), row.item(j));
+				            }
+				        }
+			        }
+			    }
+			}
+			
+			
+			
+			/* UTILITIES -----------------------------------------------------------------------------------------------------------*/
 			// Comparator
 			var dateComparator = function(a, b) {
 				var aa = a.split('/').reverse().join(),
