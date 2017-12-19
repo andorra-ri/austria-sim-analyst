@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<title>AustriaAnalyst</title>
+		
+		<style>
+			
+			@keyframes spin {
+				0% { transform: rotate(0deg); }
+    			100% { transform: rotate(360deg); }
+			}
+			
+			body {
+				text-align:center;
+				font: 12px Arial, 'sans-serif';
+			}
+			
+			/* DROPZONE */
+			#drop-zone {
+				display:block;
+				position:absolute;
+				top:50%;
+				left:50%;
+				width:400px;
+				height:150px;
+				margin:-75px 0 0 -200px;
+				border:5px dashed #EEEEEE;
+				border-radius:15px;
+				line-height:150px;
+				font-size:20px;
+				color:#BBBBBB
+			}
+			#drop-zone.loading {
+				border: 10px solid #f3f3f3; /* Light grey */
+				border-top: 10px solid #3498db; /* Blue */
+				border-radius: 50%;
+			    width: 60px;
+			    height: 60px;
+			    margin: -30px 0 0 -30px;
+			    font-size:0;
+			    animation: spin 0.7s linear infinite;
+			}
+						
+		</style>
+		
+		<script type="text/javascript">
+			
+			var dropZone;
+			
+			
+			/* PAGE LOAD -------------------------------------------------------------------------------------------------------*/
+			
+			window.onload = function() {
+				// Check File API support
+				if(!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+					alert('The File APIs are not fully supported in this browser. Try another');
+				}
+				// Event listener for Drag&Drop
+				dropZone = document.getElementById('drop-zone');
+				dropZone.addEventListener('dragover', handleDragOver, false);
+				dropZone.addEventListener('drop', handleFileDrop, false);
+			}
+			
+			
+			
+			/* FILE DRAG & DROP -------------------------------------------------------------------------------------------------*/
+			
+			function handleDragOver(evt) {
+			    evt.stopPropagation();
+			    evt.preventDefault();
+			    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+			}
+				
+				
+				
+			function handleFileDrop(evt) {
+		    	evt.stopPropagation();
+				evt.preventDefault();
+				
+				var files = evt.dataTransfer.files;
+			    for (var i = 0; i < files.length; i++) {
+				    dropZone.classList.add('loading');	// Loading spinner
+					// Read file
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						try {	// Check if file is a valid JSON
+					        var obj = JSON.parse(reader.result);
+							console.log(obj);
+							dropZone.classList.remove('loading');
+					    } catch (e) {	// File is not a valid JSON 
+						    alert('Error! File is not a valid JSON');
+					        dropZone.classList.remove('loading');
+					    }
+					}
+					reader.readAsText(files[i]);
+				}
+			}
+			
+		</script>
+		
+		
+	</head>
+	<body>
+		
+		<!-- DRAG & DROP Zone -->
+		<section id="drop-zone">Drop JSON file here</section>
+
+	</body>
+</html>
