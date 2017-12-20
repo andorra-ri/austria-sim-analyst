@@ -67,6 +67,9 @@
 			
 			table span { display:inline-block; background:#A8A8A8; color:#FFFFFF; margin:2px; padding:3px 7px; font-size:9px; border-radius:10px }
 			
+			/* CHARTS */
+			.chart { margin:10px 0 }
+			
 			/* TOOLTIP */
 			[data-tooltip]:before {
 				position: absolute;
@@ -109,6 +112,8 @@
 			
 		</style>
 		
+		
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript">
 			
 			var dropZone;
@@ -357,14 +362,19 @@
 
 				if(toggler.classList.toggle('open')) {
 				
-					var content = getExtendedContent(r);
+					google.charts.load('current', {'packages':['corechart']});  // Load the Visualization API and the piechart package.
+					google.charts.setOnLoadCallback( function() {				// Set a callback to run when the Google Visualization API is loaded.
 						
-					var newTR = document.createElement('tr');
-					var newTD = document.createElement('td');
-						newTD.colSpan = '9';
-						newTD.appendChild(content);
-					newTR.appendChild(newTD);
-					table.insertBefore(newTR, TR.nextSibling);
+						var content = getExtendedContent(r, TR.offsetWidth);
+							
+						var newTR = document.createElement('tr');
+						var newTD = document.createElement('td');
+							newTD.colSpan = '9';
+							newTD.appendChild(content);
+						newTR.appendChild(newTD);
+						table.insertBefore(newTR, TR.nextSibling);
+					
+					});
 					
 				} else TR.nextSibling.outerHTML = '';
 				
@@ -373,10 +383,18 @@
 			
 			
 			// EXTENDED CONTENT
-			function getExtendedContent(r) {
+			function getExtendedContent(r, width) {
+				
 				var content = document.createElement('div');
 					content.id = 'extended-content';
 			
+				// Prepare GoogleCharts DataTables
+				var dataDTHM = new google.visualization.DataTable();
+				dataDTHM.addColumn('string', 'Date');
+				dataDTHM.addColumn('number', 'Holiday-Makers');
+				dataDTHM.addColumn('number', 'Day-Trippers');
+
+				/*
 				// Initiate table 
 				var table = document.createElement('table');
 				var header = document.createElement('thead');
@@ -388,15 +406,39 @@
 						+ '<th data-tooltip="Origins"><svg class="icon"><use xlink:href="#icon-world"></use></svg></a></th>'
 					+ '</tr>';
 				table.appendChild(header);
+				*/
 				
 				data.resorts[r].days.forEach(function(day) {
 					if( selectedDates.indexOf(day.date) != -1 ) {
+						
+						dataDTHM.addRow([day.date, day.skiers.count[1], day.skiers.count[0]]);
+						
+						/*
 						var tr = getExtendedTableRow(day);
 						table.appendChild(tr);
+						*/
+						
 					}
 				});
 				
-				content.appendChild(table);
+				/* CHARTS */
+				// DT vs HM
+				var DTvsHM = document.createElement('section');
+					DTvsHM.classList.add('chart');
+				var chartDTHM = new google.visualization.AreaChart(DTvsHM);
+					chartDTHM.draw(dataDTHM, {
+						isStacked: true,
+						width: width,
+					    chartArea: {top:'20%', left:45, width: width-50, height: '60%'},
+					    hAxis: { textStyle: { fontSize:6 }, slantedText:true, slantedTextAngle:90 },
+					    legend: 'none',
+						'title':'DT vs HM',
+						colors: ['#3399FF', '#AAAAAA']
+					});
+				content.appendChild(DTvsHM);
+				
+				//content.appendChild(table);
+				
 				return content;
 			}
 			
