@@ -282,7 +282,8 @@
 					globalSkiersDT = 0,
 					globalSkiersHM = 0,
 					globalCrowded = 0,
-					globalBedCap = 0;
+					globalBedCap = 0,
+					globalSkierLimit = 0;
 				
 				// Start table
 				var table = '<table id="stats-table">'
@@ -295,6 +296,7 @@
 					+ '<th data-tooltip="Holiday-Makers" onclick="sortTable(\'stats-table\',5)"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
 					+ '<th data-tooltip="Crowded days" onclick="sortTable(\'stats-table\',6)"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
 					+ '<th data-tooltip="Bed capacity reached" onclick="sortTable(\'stats-table\',7)"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
+					+ '<th data-tooltip="Skier capacity reached" onclick="sortTable(\'stats-table\',8)"><svg class="icon"><use xlink:href="#icon-forbidden"></use></svg></th>'
 					+ '<th></th>'
 				+ '</tr></thead>'
 				+ '<tbody>';
@@ -310,6 +312,7 @@
 					var skiersHM = 0;
 					var crowdedDays = 0;
 					var bedCapReached = 0;
+					var skierLimit = 0;
 					
 					resort.days.forEach(function(day) {
 						
@@ -323,7 +326,8 @@
 							skiersDT += day.skiers.count[0];
 							skiersHM += day.skiers.count[1];
 							
-							if(skiersDT + skiersHM > resort.capacity * 0.4) crowdedDays++;
+							if(skiersDT + skiersHM == resort.capacity) skierLimit++;
+							if(skiersDT + skiersHM > resort.capacity * 0.5) crowdedDays++;
 							if(day.skiers.count[1] == resort.beds) bedCapReached++;
 							
 						}
@@ -336,6 +340,7 @@
 					globalSkiersHM += skiersHM;
 					globalCrowded += crowdedDays;
 					globalBedCap += bedCapReached;
+					globalSkierLimit += skierLimit;
 					
 					// Add resort table register
 					table += '<tr>'
@@ -347,6 +352,7 @@
 						+ '<td class="table-hm">' + skiersHM + '</td>'
 						+ '<td class="table-crowd">' + crowdedDays + '</td>'
 						+ '<td class="table-bedcap">' + bedCapReached + '</td>'
+						+ '<td class="table-limit">' + skierLimit + '</td>'
 						+ '<td><a href="#" data-tooltip="+ info" onclick="extend(event, this, ' + r + ')"><svg class="icon"><use xlink:href="#icon-eye"></use></svg></a></td>'
 					+ '</tr>';
 					
@@ -357,6 +363,7 @@
 				globalOpenDays /= selectedResorts.length;
 				globalCrowded /= selectedResorts.length;
 				globalBedCap /= selectedResorts.length;
+				globalSkierLimit /= selectedResorts.length;
 				
 				// Close table
 				table += '</tbody>'
@@ -369,6 +376,7 @@
 					+ '<td>' + Math.round(globalSkiersHM) + '</td>'
 					+ '<td>' + Math.round(globalCrowded) + '</td>'
 					+ '<td>' + Math.round(globalBedCap) + '</td>'
+					+ '<td>' + Math.round(globalSkierLimit) + '</td>'
 					+ '<td></td>';
 				+ '</tr></tfoot>'
 				+ '</table>';
@@ -394,7 +402,7 @@
 							
 						var newTR = document.createElement('tr');
 						var newTD = document.createElement('td');
-							newTD.colSpan = '9';
+							newTD.colSpan = '10';
 							newTD.appendChild(content);
 						newTR.appendChild(newTD);
 						table.insertBefore(newTR, TR.nextSibling);
@@ -657,6 +665,12 @@
 				<title>world</title>
 				<path d="M455.229,78.105c50.367,50.367,78.104,117.333,78.104,188.563c0,71.229-27.739,138.194-78.104,188.561 c-50.368,50.366-117.333,78.104-188.562,78.104c-71.229,0-138.195-27.738-188.562-78.104C27.738,404.862,0,337.896,0,266.668 c0-71.229,27.736-138.196,78.104-188.563S195.438,0,266.667,0C337.896,0,404.861,27.738,455.229,78.105z M431.658,431.659 c32.843-32.843,54.681-73.754,63.686-118.262c-7.019,10.331-13.732,14.165-17.888-8.961c-4.281-37.703-38.911-13.618-60.688-27.011 c-22.919,15.447-74.43-30.032-65.676,21.263c13.507,23.137,72.921-30.964,43.307,17.99 c-18.893,34.176-69.085,109.86-62.555,149.093c0.823,57.158-58.404,11.919-78.81-7.041 c-13.727-37.979-4.678-104.362-40.572-122.962c-38.959-1.691-72.398-5.232-87.497-48.786c-9.086-31.161,9.669-77.549,43.062-84.71 c48.88-30.711,66.341,35.965,112.183,37.205c14.233-14.893,53.029-19.628,56.246-36.328c-30.078-5.308,38.16-25.291-2.879-36.657 c-22.642,2.663-37.229,23.476-25.193,41.124c-43.874,10.23-45.279-63.492-87.454-40.238c-1.072,36.765-68.865,11.919-23.456,4.464 c15.602-6.816-25.448-26.57-3.271-22.98c10.894-0.592,47.569-13.444,37.644-22.084c20.421-12.677,37.583,30.359,57.572-0.98 c14.431-24.097-6.052-28.546-24.141-16.332c-10.198-11.418,18.006-36.081,42.882-46.738c8.29-3.552,16.208-5.487,22.263-4.939 c12.531,14.475,35.703,16.982,36.916-1.741c-31.031-14.861-65.247-22.712-100.672-22.712c-50.845,0-99.203,16.158-139.223,46.036 c10.755,4.927,16.86,11.062,6.499,18.904c-8.05,23.987-40.713,56.186-69.387,51.627c-14.889,25.674-24.694,53.961-28.885,83.608 c24.016,7.946,29.554,23.672,24.394,28.932c-12.237,10.671-19.759,25.797-23.633,42.355c7.817,47.832,30.298,91.914,65.245,126.862 C145.746,475.729,204.34,500,266.667,500C328.992,500,387.587,475.729,431.658,431.659z"/>
 			</symbol>
+			
+			<symbol id="icon-forbidden" viewBox="0 0 512 512">
+				<title>forbidden</title>
+				<path d="M256,0C115.39,0,0,115.39,0,256s115.39,256,256,256s256-115.39,256-256S396.61,0,256,0z M97.108,368.954 C73.48,335.805,61,296.737,61,256c0-107.52,87.48-195,195-195c40.737,0,79.805,12.48,112.954,36.108 c0.691,0.494,1.307,1.047,1.886,1.625L98.733,370.841C98.155,370.261,97.602,369.645,97.108,368.954z M256,451 c-40.737,0-79.805-12.48-112.954-36.108c-0.691-0.494-1.307-1.047-1.886-1.625l272.105-272.105 c0.581,0.58,1.135,1.197,1.626,1.885C438.52,176.195,451,215.263,451,256C451,363.52,363.52,451,256,451z"/>
+			</symbol>
+			
 		</svg>
 
 	</body>
