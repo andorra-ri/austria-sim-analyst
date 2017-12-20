@@ -432,7 +432,6 @@
 					header.innerHTML = '<tr>'
 						+ '<th data-tooltip="date"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
 						+ '<th data-tooltip="Open/Closed"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
-						'title':'DT vs HM',
 						+ '<th data-tooltip="Day-Trippers"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
 						+ '<th data-tooltip="Holiday-Makers"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
 						+ '<th data-tooltip="Origins"><svg class="icon"><use xlink:href="#icon-world"></use></svg></a></th>'
@@ -467,8 +466,8 @@
 					chartDTHM.draw(dataDTHM, {
 						isStacked: true,
 						width: width,
-					    chartArea: {top:'20%', left:45, width: width-50, height: '60%'},
-					    hAxis: { textStyle: { fontSize:6 }, slantedText:true, slantedTextAngle:90 },
+					    chartArea: { top:5, left:50, width: width-55, height:'75%'},
+					    hAxis: { textStyle: { fontSize:7 }, slantedText:true, slantedTextAngle:90 },
 					    legend: 'none',
 						colors: ['#3399FF', '#AAAAAA']
 					});
