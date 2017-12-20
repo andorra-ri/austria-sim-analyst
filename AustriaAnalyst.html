@@ -68,7 +68,8 @@
 			table span { display:inline-block; background:#A8A8A8; color:#FFFFFF; margin:2px; padding:3px 7px; font-size:9px; border-radius:10px }
 			
 			/* CHARTS */
-			.chart { margin:10px 0 }
+			.chart { margin:30px 0 }
+			svg path[fill-opacity="0.8"] { fill:#3399FF; fill-opacity:1 }
 			
 			/* TOOLTIP */
 			[data-tooltip]:before {
@@ -240,6 +241,30 @@
 				}
 				displayResults();
 			}
+			
+			
+			
+			// SKIERS SUM BY CLUSTER AND ORIGINS
+			function clusterize(day, totalSkiers, totalCluster, totalOrigin) {
+				day.skiers.origins.forEach(function(origin) {
+					var totalSkiersOrigin = 0;
+					origin.clusters.forEach(function(cluster) {
+						totalSkiersOrigin += cluster.dt + cluster.hm;
+						if(cluster.id in totalCluster) {
+							if(origin.name in totalCluster[cluster.id]) totalCluster[cluster.id][origin.name] += cluster.dt + cluster.hm;
+							else totalCluster[cluster.id][origin.name] = cluster.dt + cluster.hm;
+						} else {
+							var o = {};
+							o[origin.name] = cluster.dt + cluster.hm;
+							totalCluster[cluster.id] = o;
+						}
+					});
+					if(origin.name in totalOrigin) totalOrigin[origin.name] += totalSkiersOrigin;
+					else totalOrigin[origin.name] = totalSkiersOrigin;
+					totalSkiers += totalSkiersOrigin;
+				});
+				return [totalSkiers, totalCluster, totalOrigin];
+			}
 
 
 
@@ -362,7 +387,7 @@
 
 				if(toggler.classList.toggle('open')) {
 				
-					google.charts.load('current', {'packages':['corechart']});  // Load the Visualization API and the piechart package.
+					google.charts.load('current', {'packages':['corechart', 'sankey']});  // Load the Visualization API and the piechart package.
 					google.charts.setOnLoadCallback( function() {				// Set a callback to run when the Google Visualization API is loaded.
 						
 						var content = getExtendedContent(r, TR.offsetWidth);
@@ -394,6 +419,12 @@
 				dataDTHM.addColumn('number', 'Holiday-Makers');
 				dataDTHM.addColumn('number', 'Day-Trippers');
 
+				var dataOD = new google.visualization.DataTable();
+		        dataOD.addColumn('string', 'From');
+		        dataOD.addColumn('string', 'To');
+		        dataOD.addColumn('number', 'Skiers');
+		        dataOD.addColumn({type:'string', role:'tooltip'});
+
 				/*
 				// Initiate table 
 				var table = document.createElement('table');
@@ -401,6 +432,7 @@
 					header.innerHTML = '<tr>'
 						+ '<th data-tooltip="date"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
 						+ '<th data-tooltip="Open/Closed"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
+						'title':'DT vs HM',
 						+ '<th data-tooltip="Day-Trippers"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
 						+ '<th data-tooltip="Holiday-Makers"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
 						+ '<th data-tooltip="Origins"><svg class="icon"><use xlink:href="#icon-world"></use></svg></a></th>'
@@ -408,10 +440,16 @@
 				table.appendChild(header);
 				*/
 				
+				var totalCluster = {};
+				var totalOrigin = {};
+				var totalSkiers = 0;
+				
 				data.resorts[r].days.forEach(function(day) {
 					if( selectedDates.indexOf(day.date) != -1 ) {
 						
-						dataDTHM.addRow([day.date, day.skiers.count[1], day.skiers.count[0]]);
+						// Charts data update
+						dataDTHM.addRow([day.date, day.skiers.count[1], day.skiers.count[0]]);		// Add DTvsHM daily points
+						[totalSkiers, totalCluster, totalOrigin] = clusterize(day, totalSkiers, totalCluster, totalOrigin);	// Sum daily cluster/origin skiers
 						
 						/*
 						var tr = getExtendedTableRow(day);
@@ -432,10 +470,29 @@
 					    chartArea: {top:'20%', left:45, width: width-50, height: '60%'},
 					    hAxis: { textStyle: { fontSize:6 }, slantedText:true, slantedTextAngle:90 },
 					    legend: 'none',
-						'title':'DT vs HM',
 						colors: ['#3399FF', '#AAAAAA']
 					});
 				content.appendChild(DTvsHM);
+				
+				// OD
+				for(var c in totalCluster) {
+					for(var o in totalCluster[c]) {
+						dataOD.addRow([c, o, totalCluster[c][o], c + ' > ' + o + ' : ' + totalCluster[c][o] + 'skiers (' + (totalCluster[c][o] * 100 / totalSkiers).toFixed(2) + '%)']);
+					}
+				}  
+				for(var o in totalOrigin) {
+					dataOD.addRow([o, data.resorts[r].name, totalOrigin[o], o + ' > ' + data.resorts[r].name + ' :\n ' + totalOrigin[o] + 'skiers (' + (totalOrigin[o] * 100 / totalSkiers).toFixed(2) + '%)']);
+				}
+				var OD = document.createElement('section');
+					OD.classList.add('chart');
+				var chartOD = new google.visualization.Sankey(OD);
+					chartOD.draw(dataOD, {
+						width: width,
+						sankey: {
+							node: { width:3, interactivity:true, colors:['#333333','#444444','#222222'] }
+						}
+					});
+				content.appendChild(OD);
 				
 				//content.appendChild(table);
 				
