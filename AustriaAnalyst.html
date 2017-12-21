@@ -51,7 +51,7 @@
 			/* TABLE */
 			input[type=text] { line-height:25px; border-radius:3px; border:1px solid #DDDDDD; padding:0 7px; margin:10px 0 }
 			#table-container { display:inline-block; margin:0 auto; text-align:right }
-			table { font-size:12px; border-collapse:collapse; width:100% }
+			table { font-size:12px; border-collapse:collapse }
 			th { background:#686868; color:#FFFFFF; padding:10px 15px; position:relative; cursor:pointer; text-align:center }
 				th:first-child { text-align:right }
 			table table th:first-child { text-align:center }
@@ -434,9 +434,9 @@
 		        dataOD.addColumn('number', 'Skiers');
 		        dataOD.addColumn({type:'string', role:'tooltip'});
 
-				/*
 				// Initiate table 
 				var table = document.createElement('table');
+					table.width = width;
 				var header = document.createElement('thead');
 					header.innerHTML = '<tr>'
 						+ '<th data-tooltip="date"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
@@ -446,7 +446,6 @@
 						+ '<th data-tooltip="Origins"><svg class="icon"><use xlink:href="#icon-world"></use></svg></a></th>'
 					+ '</tr>';
 				table.appendChild(header);
-				*/
 				
 				var totalCluster = {};
 				var totalOrigin = {};
@@ -459,10 +458,8 @@
 						dataDTHM.addRow([day.date, day.skiers.count[1], day.skiers.count[0]]);		// Add DTvsHM daily points
 						[totalSkiers, totalCluster, totalOrigin] = clusterize(day, totalSkiers, totalCluster, totalOrigin);	// Sum daily cluster/origin skiers
 						
-						/*
 						var tr = getExtendedTableRow(day);
 						table.appendChild(tr);
-						*/
 						
 					}
 				});
@@ -502,7 +499,7 @@
 					});
 				content.appendChild(OD);
 				
-				//content.appendChild(table);
+				content.appendChild(table);
 				
 				return content;
 			}
