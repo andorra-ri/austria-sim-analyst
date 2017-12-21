@@ -58,6 +58,8 @@
 			table table th .icon { fill:#FFFFFF }
 			th .icon { fill:#FFFFFF; height:15px; width:15px }
 			tbody tr { border:1px solid #DDDDDD; border-top:0 }
+			tbody tr.limit { background:#FFECEC }
+			tbody tr.crowded { background:#FFF8C4 }
 			tbody tr.selected { background:#d3e7ff }
 			td { position:relative; padding:10px 15px; text-align:center }
 				td:first-child { text-align:right }
@@ -460,6 +462,12 @@
 						[totalSkiers, totalCluster, totalOrigin] = clusterize(day, totalSkiers, totalCluster, totalOrigin);	// Sum daily cluster/origin skiers
 						
 						var tr = getExtendedTableRow(day);
+						
+						// Row colouring
+						var skiersToday = day.skiers.count[0] + day.skiers.count[1]; 
+						if(skiersToday == resort.capacity) tr.classList.add('limit');
+						else if(skiersToday > resort.capacity * 0.5) tr.classList.add('crowded');
+						
 						table.appendChild(tr);
 						
 					}
