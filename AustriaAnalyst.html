@@ -291,14 +291,15 @@
 				var table = '<table id="stats-table">'
 				+ '<thead><tr>'
 					+ '<th onclick="sortTable(\'stats-table\',0)">RESORT</th>'
-					+ '<th data-tooltip="Season length" onclick="sortTable(\'stats-table\',1)"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
-					+ '<th data-tooltip="Open days" onclick="sortTable(\'stats-table\',2)"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
-					+ '<th data-tooltip="Total skiers" onclick="sortTable(\'stats-table\',3)"><svg class="icon"><use xlink:href="#icon-ski"></use></svg></th>'
-					+ '<th data-tooltip="Day-Trippers" onclick="sortTable(\'stats-table\',4)"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
-					+ '<th data-tooltip="Holiday-Makers" onclick="sortTable(\'stats-table\',5)"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
-					+ '<th data-tooltip="Crowded days" onclick="sortTable(\'stats-table\',6)"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
-					+ '<th data-tooltip="Bed capacity reached" onclick="sortTable(\'stats-table\',7)"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
-					+ '<th data-tooltip="Skier capacity reached" onclick="sortTable(\'stats-table\',8)"><svg class="icon"><use xlink:href="#icon-forbidden"></use></svg></th>'
+					+ '<th onclick="sortTable(\'stats-table\',1)">ID</th>'
+					+ '<th data-tooltip="Season length" onclick="sortTable(\'stats-table\',2)"><svg class="icon"><use xlink:href="#icon-time"></use></svg></th>'
+					+ '<th data-tooltip="Open days" onclick="sortTable(\'stats-table\',3)"><svg class="icon"><use xlink:href="#icon-open"></use></svg></th>'
+					+ '<th data-tooltip="Total skiers" onclick="sortTable(\'stats-table\',4)"><svg class="icon"><use xlink:href="#icon-ski"></use></svg></th>'
+					+ '<th data-tooltip="Day-Trippers" onclick="sortTable(\'stats-table\',5)"><svg class="icon"><use xlink:href="#icon-backpack"></use></svg></th>'
+					+ '<th data-tooltip="Holiday-Makers" onclick="sortTable(\'stats-table\',6)"><svg class="icon"><use xlink:href="#icon-suitcase"></use></svg></th>'
+					+ '<th data-tooltip="Crowded days" onclick="sortTable(\'stats-table\',7)"><svg class="icon"><use xlink:href="#icon-crowd"></use></svg></th>'
+					+ '<th data-tooltip="Bed capacity reached" onclick="sortTable(\'stats-table\',8)"><svg class="icon"><use xlink:href="#icon-bed"></use></svg></th>'
+					+ '<th data-tooltip="Skier capacity reached" onclick="sortTable(\'stats-table\',9)"><svg class="icon"><use xlink:href="#icon-forbidden"></use></svg></th>'
 					+ '<th></th>'
 				+ '</tr></thead>'
 				+ '<tbody>';
@@ -348,6 +349,7 @@
 					// Add resort table register
 					table += '<tr>'
 						+ '<td class="table-name">' + resort.name + '</td>'
+						+ '<td class="table-id">' + resort.id + '</td>'
 						+ '<td class="table-season">' + seasonLength + '</td>'
 						+ '<td class="table-open">' + openDays + '</td>'
 						+ '<td class="table-skiers">' + (skiersDT + skiersHM) + '</td>'
@@ -372,6 +374,7 @@
 				table += '</tbody>'
 				+ '<tfoot><tr>'
 					+ '<td>TOTAL / MEAN</th>'
+					+ '<td></td>'
 					+ '<td>' + Math.round(globalSeasonLength) + '</td>'
 					+ '<td>' + Math.round(globalOpenDays) + '</td>'
 					+ '<td>' + Math.round(globalSkiersDT + globalSkiersHM) + '</td>'
@@ -405,7 +408,7 @@
 							
 						var newTR = document.createElement('tr');
 						var newTD = document.createElement('td');
-							newTD.colSpan = '10';
+							newTD.colSpan = '11';
 							newTD.appendChild(content);
 						newTR.appendChild(newTD);
 						table.insertBefore(newTR, TR.nextSibling);
