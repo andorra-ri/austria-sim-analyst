@@ -418,6 +418,7 @@
 			
 			// EXTENDED CONTENT
 			function getExtendedContent(r, width) {
+				var resort = data.resorts[r];
 				
 				var content = document.createElement('div');
 					content.id = 'extended-content';
@@ -451,7 +452,7 @@
 				var totalOrigin = {};
 				var totalSkiers = 0;
 				
-				data.resorts[r].days.forEach(function(day) {
+				resort.days.forEach(function(day) {
 					if( selectedDates.indexOf(day.date) != -1 ) {
 						
 						// Charts data update
@@ -486,7 +487,7 @@
 					}
 				}  
 				for(var o in totalOrigin) {
-					dataOD.addRow([o, data.resorts[r].name, totalOrigin[o], o + ' > ' + data.resorts[r].name + ' :\n ' + totalOrigin[o] + 'skiers (' + (totalOrigin[o] * 100 / totalSkiers).toFixed(2) + '%)']);
+					dataOD.addRow([o, resort.name, totalOrigin[o], o + ' > ' + resort.name + ' :\n ' + totalOrigin[o] + 'skiers (' + (totalOrigin[o] * 100 / totalSkiers).toFixed(2) + '%)']);
 				}
 				var OD = document.createElement('section');
 					OD.classList.add('chart');
