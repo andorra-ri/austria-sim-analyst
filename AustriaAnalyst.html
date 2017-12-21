@@ -323,12 +323,13 @@
 							// Update resort variables
 							if(day.open) openDays++;
 							
+							var skiersToday = day.skiers.count[0] + day.skiers.count[1];
 							skiersDT += day.skiers.count[0];
 							skiersHM += day.skiers.count[1];
 							
-							if(skiersDT + skiersHM == resort.capacity) skierLimit++;
-							if(skiersDT + skiersHM > resort.capacity * 0.5) crowdedDays++;
-							if(day.skiers.count[1] == resort.beds) bedCapReached++;
+							if(skiersToday == resort.capacity) skierLimit++;
+							if(skiersToday > resort.capacity * 0.5) crowdedDays++;
+							if(day.skiers.count[1] == resort.beds && resort.beds != 0) bedCapReached++;
 							
 						}
 					});
