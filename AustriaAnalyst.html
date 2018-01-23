@@ -73,6 +73,10 @@
 			.chart { margin:30px 0 }
 			svg path[fill-opacity="0.8"] { fill:#3399FF; fill-opacity:1 }
 			
+			#season-chart {
+				padding:5px 0;
+			}
+			
 			/* TOOLTIP */
 			[data-tooltip]:before {
 				position: absolute;
@@ -186,40 +190,85 @@
 			// PROCESS JSON FILE
 			function processJSON(obj) {
 				
-				var resortList = document.getElementById("resort-list");
-				resortList.addEventListener('change', selectResort, false);
-				
-			    var dateList = document.getElementById("date-list");
-				dateList.addEventListener('change', selectDate, false);
-				
-				var dates = [];	// Buffer for saved days
-				
-				// List all resorts in resortList
-				obj.resorts.forEach(function(resort, i) {
-					var resortOpt = document.createElement('option');
-						resortOpt.value = i;
-						resortOpt.text = resort.name;
-					resortList.appendChild(resortOpt);
-						
-					// List unique days
-					resort.days.forEach(function(day) {
-						if(dates.indexOf(day.date)==-1) dates.push(day.date);	
+				google.charts.load('current', {'packages':['corechart']});  // Load the Visualization API and the piechart package.
+				google.charts.setOnLoadCallback( function() {				// Set a callback to run when the Google Visualization API is loaded.
+					
+					// DataTable for season-chart
+					var seasonSkierDays = new google.visualization.DataTable();
+					seasonSkierDays.addColumn('string', 'Date');
+					seasonSkierDays.addColumn('number', 'Hosted DT');
+					seasonSkierDays.addColumn('number', 'Hosted HM');
+					seasonSkierDays.addColumn('number', 'Unhosted DT');
+					seasonSkierDays.addColumn('number', 'Unhosted HM');
+					
+					// Select boxes events
+					var resortList = document.getElementById("resort-list");
+					resortList.addEventListener('change', selectResort, false);
+					
+				    var dateList = document.getElementById("date-list");
+					dateList.addEventListener('change', selectDate, false);
+					
+					// READ DATA
+					var dates = [];	// Buffer for saved days
+					var skierDays = {} // Buffer to sum total skiers days
+					
+					// List all resorts in resortList
+					obj.resorts.forEach(function(resort, i) {
+						var resortOpt = document.createElement('option');
+							resortOpt.value = i;
+							resortOpt.text = resort.name;
+						resortList.appendChild(resortOpt);
+							
+						// List unique days
+						resort.days.forEach(function(day) {
+							if(dates.indexOf(day.date)==-1) dates.push(day.date);
+							
+							if(resort.name != 'unhosted') {
+								if(!(day.date in skierDays)) skierDays[day.date] = [day.skiers.count[0], day.skiers.count[1], 0, 0];
+								else {
+									skierDays[day.date][0] += day.skiers.count[0];
+									skierDays[day.date][1] += day.skiers.count[1];
+								}
+							} else {
+								if(!(day.date in skierDays)) skierDays[day.date] = [0, 0, day.skiers.count[0], day.skiers.count[1]];
+								else {
+									skierDays[day.date][2] += day.skiers.count[0];
+									skierDays[day.date][3] += day.skiers.count[1];
+								}
+							}
+							
+						});
+							
 					});
-						
-				});
+					
+					
+					// Sort date buffer
+					dates.sort(dateComparator);
+					dates.forEach(function(date) {
+						// Add date in dateList
+						var dateOpt = document.createElement('option');
+							dateOpt.value = date;
+							dateOpt.text = date;
+						dateList.appendChild(dateOpt);
+						// Fill season-chart DataTable
+						seasonSkierDays.addRow([date, skierDays[date][0], skierDays[date][1], skierDays[date][2], skierDays[date][3]]);
+					});
+					
+					
+					data = obj;	 // Keep data in memory
+					
+					var seasonChart = new google.visualization.LineChart(document.getElementById('season-chart'));
+					seasonChart.draw(seasonSkierDays, {
+			          title: 'Season skierdays distribution',
+			          isStacked: true,
+			          width:'100%',
+			          height:400,
+					  hAxis: { textStyle: { fontSize:7 }, slantedText:true, slantedTextAngle:90 },
+			          colors: ['#3399FF', '#66BBFF', '#AAAAAA', '#CCCCCC']
+			        });
+					
+				});	
 				
-				// Sort date buffer
-				dates.sort(dateComparator);
-				
-				// List dates in dateList
-				dates.forEach(function(date) {
-					var dateOpt = document.createElement('option');
-						dateOpt.value = date;
-						dateOpt.text = date;
-					dateList.appendChild(dateOpt);
-				});
-				
-				data = obj;	 // Keep data in memory
 			}
 			
 			
@@ -612,6 +661,8 @@
 			<p>Use <span class="key">CTRL</span> and <span class="key">SHIFT</span> keys to select multiple options (<span class="key">&#8984;</span> and <span class="key">&#8679;</span> in Mac)</p>
 			<select multiple id="resort-list"></select>
 			<select multiple id="date-list"></select>
+			<hr/>
+			<section id="season-chart"></section>
 			<hr/>
 			<section id="table-container"></section>
 		</section>
